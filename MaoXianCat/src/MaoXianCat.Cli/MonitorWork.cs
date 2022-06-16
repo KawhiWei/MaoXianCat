@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using MaoXianCat.Files;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -8,15 +10,23 @@ public class MonitorWork : BackgroundService
 {
     private readonly ILogger<MonitorWork> _logger;
     private readonly IOptionsMonitor<FilePorterOptions> _optionsAccessor;
-
-    public MonitorWork(IOptionsMonitor<FilePorterOptions> optionsMonitor, ILogger<MonitorWork> logger)
+    private readonly IServiceProvider _serviceProvider;
+    public MonitorWork(IOptionsMonitor<FilePorterOptions> optionsMonitor, ILogger<MonitorWork> logger,IServiceProvider serviceProvider)
     {
         _optionsAccessor = optionsMonitor;
         _logger = logger;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+
+        
+        
+        Task.Factory.StartNew(Watching);
+        
+        
+        
         while (stoppingToken.IsCancellationRequested == false)
         {
             try
@@ -106,6 +116,22 @@ public class MonitorWork : BackgroundService
                 string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
                 CopyDirectory(subDir.FullName, newDestinationDir, true);
             }
+        }
+    }
+
+
+    private void Watching()
+    {
+        using (var rootScope=_serviceProvider.CreateScope())
+        {
+            var watch= rootScope.ServiceProvider.GetRequiredService<Watch>();
+            watch.Watching();
+            
+            while (true)
+            {
+                Thread.Sleep(100000);
+            }
+            
         }
     }
 }

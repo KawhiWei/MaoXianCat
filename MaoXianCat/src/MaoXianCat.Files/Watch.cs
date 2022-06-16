@@ -12,11 +12,16 @@ public class Watch
 
     public  void Watching()
     {
-        this._watcher = new FileSystemWatcher();
-        _watcher.Path = "";
-        _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size | NotifyFilters.DirectoryName;
-        _watcher.IncludeSubdirectories = true;
-        _watcher.Created += new FileSystemEventHandler(_moveFile.OnCreateFile);
-        _watcher.Changed += new FileSystemEventHandler(_moveFile.OnChangeFile);
+        var directory= Path.Combine("/Users/wangzewei/Documents/Code/download/mx-wc");
+
+        if (Directory.Exists(directory))
+        {
+            this._watcher = new FileSystemWatcher(directory);
+            _watcher.Path = directory;
+            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size | NotifyFilters.DirectoryName;
+            _watcher.IncludeSubdirectories = true;
+            _watcher.Created += new FileSystemEventHandler(_moveFile.OnCreateFile);    
+        }
+        
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using MaoXianCat.Cli;
+using MaoXianCat.Files;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,6 +38,8 @@ static IHostBuilder CreateHostBuilder(string[] args)
         })
         .ConfigureServices((hostContext, services) =>
         {
+            services.AddScoped<Watch>();
+            services.AddScoped<IMoveFile,MoveFile>();
             services.AddHostedService<MonitorWork>();
             services.Configure<FilePorterOptions>(hostContext.Configuration.GetSection("FilePorter"));
         });
